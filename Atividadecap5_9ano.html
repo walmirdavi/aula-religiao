@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>As Novas Configurações Religiosas: Uma Exploração Interativa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices: 
+        - Report Info: Definitions of Sincretismo/Hibridismo -> Goal: Inform -> Method: Side-by-side text blocks using HTML/Tailwind -> Interaction: Subtle hover effects -> Justification: Clear, direct presentation of core concepts first.
+        - Report Info: List of all religious movements -> Goal: Organize & Inform -> Method: Grid of interactive cards (HTML/Tailwind) -> Interaction: On-click modal displays detailed info from a JS data object -> Justification: Allows users to explore specific movements at their own pace without overwhelming them with text.
+        - Report Info: Oriental practices (yoga, feng shui) -> Goal: Organize & Inform -> Method: Interactive grid of cards -> Interaction: On-click modal displays descriptions -> Justification: Groups related content thematically for clarity, now with interactive details.
+        - Report Info: Founding dates of new movements -> Goal: Show Change & Compare -> Method: Timeline using a Chart.js scatter plot -> Interaction: Tooltips on hover provide quick facts -> Justification: Visually represents the historical timeline and clustering of movements more effectively than a simple list.
+        - All data is stored in a structured JS object for clean management and dynamic content injection. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            height: 500px;
+            width: 100%;
+        }
+        .nav-link {
+            transition: color 0.3s;
+        }
+        .nav-link:hover {
+            color: #A0522D;
+        }
+        .card-hover {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .modal {
+            transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-gray-800">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-xl font-bold text-gray-800">Religião em Foco</div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#conceitos" class="nav-link text-gray-600">Conceitos</a>
+                <a href="#mosaico" class="nav-link text-gray-600">Mosaico Religioso</a>
+                <a href="#influencia" class="nav-link text-gray-600">Influência Oriental</a>
+                <a href="#timeline" class="nav-link text-gray-600">Linha do Tempo</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section class="text-center mb-24">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 text-gray-900">As Novas Configurações Religiosas</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">Uma exploração interativa sobre a diversidade, o sincretismo e as transformações da fé no Brasil, baseada no capítulo 5 do nosso material de estudo.</p>
+        </section>
+
+        <section id="conceitos" class="mb-24 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2">Conceitos-Chave</h2>
+            <p class="text-center text-gray-600 mb-12">Para começar, vamos entender dois termos fundamentais que explicam as misturas culturais e religiosas no Brasil.</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-bold mb-3 text-brown-700">Sincretismo</h3>
+                    <p class="text-gray-700">É a combinação de elementos de duas ou mais tradições religiosas, compondo uma nova estrutura de crenças, rituais e preceitos éticos. O sincretismo ocorre quando, no mínimo, duas culturas diferentes entram em contato e se misturam, podendo ser uma poderosa ferramenta de resistência cultural e religiosa.</p>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-bold mb-3 text-brown-700">Hibridismo</h3>
+                    <p class="text-gray-700">Parecido com o sincretismo, é um processo de troca e modificação cultural. Uma tradição religiosa, ao entrar em contato com outra, sofre influências e dá origem a uma estrutura nova e original. O fenômeno religioso brasileiro é um grande exemplo de hibridismo, onde diversas origens se encontraram e geraram novas combinações.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="mosaico" class="mb-24 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2">Mosaico Religioso Brasileiro</h2>
+            <p class="text-center text-gray-600 mb-12">O Brasil é um caldeirão de crenças. Clique nos cards abaixo para explorar alguns dos movimentos e religiões mencionados no texto e descobrir suas características e elementos de sincretismo.</p>
+            <div id="mosaico-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+        </section>
+
+        <section id="influencia" class="mb-24 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2">A Influência Oriental no Ocidente</h2>
+            <p class="text-center text-gray-600 mb-12">O texto destaca um movimento de "orientalização do Ocidente". Clique nas práticas e crenças abaixo para saber mais sobre como foram incorporadas à cultura brasileira.</p>
+            <div id="oriental-practices-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            </div>
+        </section>
+        
+        <section id="timeline" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2">Linha do Tempo dos Novos Movimentos</h2>
+            <p class="text-center text-gray-600 mb-12">Muitos dos novos movimentos religiosos surgiram em períodos históricos específicos. O gráfico abaixo mostra uma linha do tempo, destacando quando alguns desses movimentos foram fundados ou chegaram ao Brasil. Passe o mouse sobre os pontos para ver os detalhes.</p>
+            <div class="bg-white p-4 md:p-8 rounded-lg shadow-md">
+                <div class="chart-container">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center py-8 mt-16 bg-gray-100">
+        <p class="text-gray-600">Aplicação interativa desenvolvida com base no Capítulo 5: "As novas configurações religiosas".</p>
+    </footer>
+
+    <div id="modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" id="modal-content">
+            <div class="p-8">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 id="modal-title" class="text-2xl font-bold"></h3>
+                    <button id="close-modal-btn" class="text-3xl font-light leading-none">&times;</button>
+                </div>
+                <div id="modal-body" class="text-gray-700 space-y-4">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const religiousMovements = [
+            { id: 0, name: 'Umbanda', category: 'Matriz Africana/Brasileira', origin: 'Brasil', year: null, description: 'Religião brasileira que demonstra um claro exemplo de sincretismo e hibridismo.', syncretism: 'Originada da influência de elementos europeus e indígenas nos cultos de matrizes africanas. É possível observar na Umbanda elementos das tradições cristã, da matriz africana, da cosmovisão indígena, bem como da doutrina espírita.' },
+            { id: 1, name: 'Tambor de Mina', category: 'Matriz Africana/Brasileira', origin: 'Maranhão, Brasil', year: 1800, description: 'Religião de matriz africana nascida no Maranhão e que se estendeu para a região Norte do país desde o século XIX. É uma religião muito ritualizada e discreta, envolvida em segredos e mistérios. Apresenta rituais e festas com transe, danças e comida abundante.', syncretism: 'Como as demais religiões afro-brasileiras, mescla elementos culturais e rituais próprios, resistindo e se adaptando ao contexto brasileiro.' },
+            { id: 2, name: 'Centro Espírita Beneficente União do Vegetal', category: 'Híbrido', origin: 'Brasil', year: null, description: 'Religião com características religiosas indígenas, baseada nos ensinamentos de Jesus e na crença na reencarnação.', syncretism: 'Combina a crença na reencarnação (influência espírita) com ensinamentos de Jesus (cristianismo) e rituais que utilizam o chá indígena ayahuasca para fins sacramentais (tradição indígena).' },
+            { id: 3, name: 'Renovação Carismática Católica', category: 'Cristão', origin: 'EUA (chegada ao Brasil na década de 1970)', year: 1970, description: 'Movimento surgido no interior da Igreja Católica dos Estados Unidos na década de 1960. Chegou ao Brasil nos anos 1970.', syncretism: 'Embora dentro do catolicismo, incorpora novas práticas como a espontaneidade nas orações, glossolalia (rezar em línguas desconhecidas), batismo no Espírito Santo, músicas alegres e danças, mostrando uma hibridização de práticas devocionais.' },
+            { id: 4, name: 'Igreja Adventista do Sétimo Dia', category: 'Cristão', origin: 'EUA', year: 1840, description: 'Igreja cristã protestante fundada nos Estados Unidos, no século XIX, com base no trabalho de William Miller. Sua crença fundamental é a volta de Jesus Cristo a este mundo.', syncretism: 'Representa um novo movimento dentro da tradição protestante com uma reinterpretação específica das escrituras.' },
+            { id: 5, name: 'Testemunhas de Jeová', category: 'Cristão', origin: 'EUA (chegada ao Brasil na década de 1920)', year: 1920, description: 'Comunidade religiosa originária de Pittsburgh, EUA, no final do século XIX. Acreditam no Deus da Bíblia, Jeová, e seguem os ensinamentos de Jesus, mas não creem em um Deus trinitário. São conhecidos por anunciar sua fé de casa em casa.', syncretism: 'Oferecem uma interpretação distinta da teologia cristã tradicional.' },
+            { id: 6, name: 'Igreja Universal do Reino de Deus', category: 'Cristão', origin: 'Rio de Janeiro, Brasil', year: 1977, description: 'Igreja do movimento evangélico neopentecostal, fundada no Rio de Janeiro em 1977.', syncretism: 'Parte do movimento neopentecostal, que reinterpreta práticas e teologias, muitas vezes com foco em teologia da prosperidade e Batalha Espiritual, mostrando uma nova configuração do protestantismo no Brasil.' },
+            { id: 7, name: 'Renascer em Cristo', category: 'Cristão', origin: 'São Paulo, Brasil', year: 1986, description: 'Igreja do movimento evangélico neopentecostal, fundada em São Paulo em 1986.', syncretism: 'Similar à IURD, faz parte da expansão neopentecostal, adaptando a mensagem evangélica a novos formatos e públicos.' },
+            { id: 8, name: 'Comunidade Evangélica Sara Nossa Terra', category: 'Cristão', origin: 'Brasília, Brasil', year: 1992, description: 'Igreja do movimento evangélico neopentecostal, fundada em Brasília em 1992.', syncretism: 'Continua a tendência neopentecostal de criar novas estruturas eclesiásticas e abordagens de culto no cenário brasileiro.' }
+        ];
+
+        const orientalPractices = [
+            { id: 0, name: 'Ioga e Meditação', icon: '🧘', description: 'Práticas milenares orientais que buscam o equilíbrio físico e mental, a conexão com o interior e a expansão da consciência. Foram amplamente adotadas no Ocidente como ferramentas para bem-estar e espiritualidade.' },
+            { id: 1, name: 'Mandalas', icon: '🎨', description: 'Desenhos geométricos complexos de origem oriental, utilizados como ferramentas para meditação, concentração e representação do universo. No Ocidente, são usadas tanto em práticas espirituais quanto artísticas.' },
+            { id: 2, name: 'Uso de Incenso', icon: '💨', description: 'Prática comum em diversas tradições orientais para purificação de ambientes, rituais e meditação. No Brasil, seu uso também se popularizou devido ao sincretismo com as tradições de matriz africana e indígena, especialmente em rituais individuais de purificação.' },
+            { id: 3, name: 'Feng Shui', icon: '☯️', description: 'Um conjunto de técnicas de origem taoísta que busca harmonizar os ambientes para atrair boas energias e promover o bem-estar. Envolve a organização do espaço, a disposição de objetos e o uso de cores, sendo aplicado em residências e locais de trabalho no Ocidente.' },
+            { id: 4, name: 'Crença na força de uma energia vital', icon: '✨', description: 'Conceito presente em diversas filosofias orientais (como o Chi ou Prana) que se refere a uma energia fundamental que permeia tudo. Essa crença foi incorporada por muitos ocidentais na busca por uma compreensão mais mística e cósmica da vida.' },
+            { id: 5, name: 'Transmigração da alma e reencarnação', icon: '🔄', description: 'Crenças centrais em muitas religiões orientais como o Hinduísmo e o Budismo, que postulam a continuidade da alma através de múltiplos renascimentos. No Ocidente, essa ideia ganhou força, influenciando movimentos espirituais e a forma como as pessoas encaram a vida e a morte.' },
+            { id: 6, name: 'Busca de gurus e de ensinamentos espirituais do Oriente', icon: '📚', description: 'O interesse por mestres espirituais e filosofias orientais levou muitos ocidentais a buscar gurus e ensinamentos que oferecem novas perspectivas sobre a vida, a ética e a espiritualidade, muitas vezes fora das religiões tradicionais.' },
+            { id: 7, name: 'Concepção mística, cósmica e panteísta da relação entre o ser humano, o meio ambiente e o Transcendente', icon: '🌍', description: 'Uma visão de mundo que vê o divino presente em toda a natureza e no universo, e que enfatiza a interconexão entre todos os seres. Essa perspectiva, comum em tradições orientais, influenciou o pensamento ocidental, promovendo uma maior consciência ambiental e uma espiritualidade mais holística.' },
+            { id: 8, name: 'Alimentação macrobiótica ou vegana', icon: '🥗', description: 'Regimes alimentares que, embora não sejam exclusivos do Oriente, têm fortes raízes em filosofias orientais que valorizam a conexão com a natureza e a pureza do corpo. A adoção dessas dietas no Ocidente reflete uma busca por um estilo de vida mais saudável e consciente, influenciada por esses princípios.' }
+        ];
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const mosaicoGrid = document.getElementById('mosaico-grid');
+            const orientalPracticesGrid = document.getElementById('oriental-practices-grid');
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modal-content');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            
+            religiousMovements.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-lg shadow-md cursor-pointer card-hover';
+                card.innerHTML = `
+                    <h3 class="text-xl font-bold mb-2">${item.name}</h3>
+                    <p class="text-sm text-gray-500">${item.category}</p>
+                `;
+                card.addEventListener('click', () => openModal(item.name, `<p><strong>Origem:</strong> ${item.origin}</p><p><strong>Descrição:</strong> ${item.description}</p><p class="mt-4 pt-4 border-t border-gray-200"><strong>Elementos de Sincretismo/Hibridismo:</strong> ${item.syncretism}</p>`));
+                mosaicoGrid.appendChild(card);
+            });
+
+            orientalPractices.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-lg shadow-md text-center cursor-pointer card-hover';
+                card.innerHTML = `
+                    <div class="text-3xl mb-2">${item.icon}</div>
+                    <h4 class="font-bold">${item.name}</h4>
+                `;
+                card.addEventListener('click', () => openModal(item.name, `<p>${item.description}</p>`));
+                orientalPracticesGrid.appendChild(card);
+            });
+
+
+            function openModal(title, bodyHtml) {
+                modalTitle.textContent = title;
+                modalBody.innerHTML = bodyHtml;
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+            }
+
+            function closeModal() {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            closeModalBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+            const timelineData = religiousMovements
+                .filter(item => item.year !== null && item.year >= 1800)
+                .map((item, index) => ({
+                    x: item.year,
+                    y: index, 
+                    label: item.name
+                }));
+
+            new Chart(timelineCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Surgimento do Movimento',
+                        data: timelineData,
+                        backgroundColor: '#A0522D',
+                        pointRadius: 8,
+                        pointHoverRadius: 12
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'Ano'
+                            },
+                            min: 1800,
+                            max: 2000,
+                        },
+                        y: {
+                            display: false,
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const dataPoint = context.raw;
+                                    return `${dataPoint.label}: ${dataPoint.x}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
